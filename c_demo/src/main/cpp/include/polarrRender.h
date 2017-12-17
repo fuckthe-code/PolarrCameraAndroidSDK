@@ -106,7 +106,7 @@ public:
 
     void updateStates(RenderState *state);
 
-    void setInputYUV(INPUT_YUV_TYPE yuvType, uint width, uint height, unsigned char *yuvBytes);
+    void setInputYUV(INPUT_YUV_TYPE yuvType, unsigned int width, unsigned int height, unsigned char *yuvBytes);
 
     unsigned char *getOutputYUV(INPUT_YUV_TYPE yuvType, int *len);
 

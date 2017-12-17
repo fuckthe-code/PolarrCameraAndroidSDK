@@ -97,7 +97,7 @@ class DemoView extends GLSurfaceView {
 
                 PolarrRenderJni.renderTest();
                 yuvData = PolarrRenderJni.getYUVData();
-                PolarrRenderJni.setYUVData(960, 720, yuvData);
+                PolarrRenderJni.setYUVData(w, h, yuvData);
 
             }
         }

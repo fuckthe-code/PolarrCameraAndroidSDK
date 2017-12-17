@@ -1,1 +1,1 @@
-include ':demo'
+include ':c_demo', ':java_demo'
