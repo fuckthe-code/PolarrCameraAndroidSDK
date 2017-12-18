@@ -3,9 +3,6 @@
 //
 
 #include <jni.h>
-#include <sys/types.h>
-#include <stdlib.h>
-#include <time.h>
 #include "polarrRender.h"
 
 PolarrRender *polarrRender;
@@ -30,29 +27,32 @@ jbyteArray as_byte_array(JNIEnv *env, unsigned char *buf, int len) {
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_co_polarr_render_PolarrRenderJni_init(JNIEnv *env, jclass type, jint texId, jint width,
-                                           jint height, jint outTexId, jbyteArray yuvArr) {
+Java_co_polarr_render_PolarrRenderJni_init(JNIEnv *env, jclass type, jint texId,
+                                           jint width, jint height,
+                                           jint stride, jint scanline,
+                                           jint outTexId, jbyteArray yuvArr, jboolean needEgl) {
     polarrRender = new PolarrRender;
 //    printGlString("Version", GL_VERSION);
 //    printGlString("Vendor", GL_VENDOR);
 //    printGlString("ShaderRender", GL_RENDERER);
 //    printGlString("Extensions", GL_EXTENSIONS);
-    polarrRender->init(width, height);
+    polarrRender->init(width, height, needEgl);
 //    if (outTexId <= 0) {
 //        return;
 //    }
-
-    inputTexId = texId;
-    outputTexId = outTexId;
+    inputTexId = (unsigned int) texId;
+    outputTexId = (unsigned int) outTexId;
 
     polarrRender->setInput(inputTexId, width, height);
     polarrRender->setOutput(outputTexId);
 
     unsigned char *yuvBytes = as_unsigned_char_array(env, yuvArr);
-    polarrRender->setInputYUV(INPUT_YUV_TYPE_NV21, (unsigned int) width, (unsigned int) height,
+    polarrRender->setInputYUV(INPUT_YUV_TYPE_NV21,
+                              (unsigned int) width, (unsigned int) height,
+                              (unsigned int) stride, (unsigned int) scanline,
                               yuvBytes);
-    delete yuvBytes;
 
+    delete yuvBytes;
 }
 
 extern "C"
@@ -67,18 +67,18 @@ Java_co_polarr_render_PolarrRenderJni_getYUVData(JNIEnv *env, jclass type) {
 extern "C"
 JNIEXPORT void JNICALL
 Java_co_polarr_render_PolarrRenderJni_renderTest(JNIEnv *env, jclass type) {
-    srand((unsigned int) time(0));
-    polarrRender->updateStates(polarrRender->getFilter(DEFAULT));
-    float r = rand() / (RAND_MAX + 1.0f) * 4;
-    if (r < 1) {
-        polarrRender->updateStates(polarrRender->getFilter(MODE1));
-    } else if (r < 2) {
-        polarrRender->updateStates(polarrRender->getFilter(MODE2));
-    } else if (r < 3) {
-        polarrRender->updateStates(polarrRender->getFilter(MODE3));
-    } else {
-        polarrRender->updateStates(polarrRender->getFilter(MODE4));
-    }
+//    srand((unsigned int) time(0));
+//    polarrRender->updateStates((*polarrRender).getFilter(DEFAULT));
+//    float r = rand() / (RAND_MAX + 1.0f) * 4;
+//    if (r < 1) {
+//        polarrRender->updateStates((*polarrRender).getFilter(MODE1));
+//    } else if (r < 2) {
+//        polarrRender->updateStates((*polarrRender).getFilter(MODE2));
+//    } else if (r < 3) {
+//        polarrRender->updateStates((*polarrRender).getFilter(MODE3));
+//    } else {
+//        polarrRender->updateStates((*polarrRender).getFilter(MODE4));
+//    }
     polarrRender->drawFrame();
     polarrRender->renderScreen(outputTexId);
 }
@@ -97,10 +97,14 @@ Java_co_polarr_render_PolarrRenderJni_release(JNIEnv *env, jclass type) {
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_co_polarr_render_PolarrRenderJni_setYUVData(JNIEnv *env, jclass type, jint width, jint height,
+Java_co_polarr_render_PolarrRenderJni_setYUVData(JNIEnv *env, jclass type,
+                                                 jint width, jint height,
+                                                 jint stride, jint scanline,
                                                  jbyteArray yuvArr) {
     unsigned char *yuvBytes = as_unsigned_char_array(env, yuvArr);
-    polarrRender->setInputYUV(INPUT_YUV_TYPE_NV21, (unsigned int) width, (unsigned int) height,
+    polarrRender->setInputYUV(INPUT_YUV_TYPE_NV21,
+                              (unsigned int) width, (unsigned int) height,
+                              (unsigned int) stride, (unsigned int) scanline,
                               yuvBytes);
     delete yuvBytes;
 }

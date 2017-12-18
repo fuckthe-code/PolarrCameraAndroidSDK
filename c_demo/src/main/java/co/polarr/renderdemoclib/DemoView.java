@@ -17,11 +17,8 @@
 package co.polarr.renderdemoclib;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
-import android.opengl.GLUtils;
 import android.util.Log;
 
 import java.io.IOException;
@@ -37,12 +34,64 @@ class DemoView extends GLSurfaceView {
         super(context);
         setEGLContextClientVersion(3);
         setRenderer(new Renderer(context));
+
+        prepareYUVDemoData(context);
+
+        // run on non-gl thread
+//        {
+//            PolarrRenderJni.init(0,
+//                    w, h,
+//                    stride, scanline,
+//                    0, yuvData, true);
+//            PolarrRenderJni.renderTest();
+//            PolarrRenderJni.getYUVData();
+//            PolarrRenderJni.renderTest();
+//            PolarrRenderJni.release();
+//        }
+    }
+
+    private static void doFlow() {
+        PolarrRenderJni.setYUVData(w, h, stride, scanline, yuvData);
+        PolarrRenderJni.renderTest();
+        PolarrRenderJni.getYUVData();
+    }
+
+    static int w = 0;
+    static int h = 0;
+    static int stride = 0;
+    static int scanline = 0;
+    static byte[] yuvData;
+
+    private static void prepareYUVDemoData(Context context) {
+        String fileName = "";
+
+        int demoIndex = 0;
+
+        switch (demoIndex) {
+
+            case 0: {
+                fileName = "yuv.dat";
+                w = 960;
+                h = 720;
+                stride = 960;
+                scanline = 720;
+            }
+        }
+
+        yuvData = new byte[stride * scanline * 3 / 2];
+        try {
+            InputStream is = context.getAssets().open(fileName);
+            is.read(yuvData);
+            is.close();
+        } catch (IOException e) {
+            System.out.println("IoException:" + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private static class Renderer implements GLSurfaceView.Renderer {
         private final Context context;
         private int outputTex;
-        private byte[] yuvData;
 
         public Renderer(Context context) {
             this.context = context;
@@ -51,14 +100,12 @@ class DemoView extends GLSurfaceView {
         public void onDrawFrame(GL10 gl) {
             GLES20.glClearColor(0, 0, 0, 1);
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-
-            PolarrRenderJni.renderTest();
-            PolarrRenderJni.getYUVData();
+            doFlow();
         }
 
         public void onSurfaceChanged(GL10 gl, int width, int height) {
-            PolarrRenderJni.resize(width, height);
-            updateSize(outputTex, width, height);
+//            PolarrRenderJni.resize(width, height);
+//            updateSize(outputTex, width, height);
         }
 
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
@@ -78,27 +125,13 @@ class DemoView extends GLSurfaceView {
 //                PolarrRenderJni.init(intputTexture, width, height, outputTex);
 //                bitmap.recycle();
 
-                int w = 960;
-                int h = 720;
-                yuvData = new byte[w * h * 3 / 2];
-                try {
-                    InputStream is = context.getAssets().open("yuv.dat");
-                    is.read(yuvData);
-                    is.close();
-                } catch (IOException e) {
-                    System.out.println("IoException:" + e.getMessage());
-                    e.printStackTrace();
-                }
-
                 int intputTexture = genTexture(w, h);
                 outputTex = genTexture(w, h);
 
-                PolarrRenderJni.init(intputTexture, w, h, outputTex, yuvData);
-
-                PolarrRenderJni.renderTest();
-                yuvData = PolarrRenderJni.getYUVData();
-                PolarrRenderJni.setYUVData(w, h, yuvData);
-
+                PolarrRenderJni.init(intputTexture,
+                        w, h,
+                        stride, scanline,
+                        outputTex, yuvData, false);
             }
         }
 

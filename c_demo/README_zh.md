@@ -7,9 +7,11 @@
 #include "polarrRender.h"
 ```
 ## 初始化 PolarrRender
+如果在非OpenGL环境下调用，请将needEgl参数设置为true。
 ```objectivec
 polarrRender = new PolarrRender;
-polarrRender->init(width, height);
+bool needEgl;
+polarrRender->init(width, height, needEgl);
 ```
 ## 设置Texture
 ### 设置输入Texture
@@ -56,15 +58,17 @@ polarrRender->renderScreen(outputTexId);
 ```
 ## YUV支持
 ### 输入YUV数据
-设置YUV数据前，需要先 [更新渲染尺寸](#更新渲染尺寸)为输入数据的真实尺寸
+设置YUV数据前，需要先 [更新渲染尺寸](#更新渲染尺寸)为输入数据的真实尺寸。
 ```objectivec
 // 目前只支持NV21格式
-polarrRender->setInputYUV(INPUT_YUV_TYPE_NV21, (unsigned int) width, (unsigned int) height, yuvBytes);
+polarrRender->setInputYUV(INPUT_YUV_TYPE_NV21, width, height, stride, scanline, *yuvBytes);
 ```
 ### 渲染YUV数据
 调用[渲染](#渲染)接口
 
 ### 输出YUV数据
+如果设置了输入YUV的stride和scanline，那么输出的YUV数据以相同的stride和scanline输出。
+如果在输入YUV数据后调用了updateSize方法，那么输出的YUV数据中实际图片大小为updateSize的宽高。数据大小仍为stride*scanline。
 ```objectivec
 // 目前只支持NV21格式
 int len;

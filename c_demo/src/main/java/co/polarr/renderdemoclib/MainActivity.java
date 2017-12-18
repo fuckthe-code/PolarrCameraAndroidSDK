@@ -18,6 +18,7 @@ package co.polarr.renderdemoclib;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.widget.ImageView;
 
 public class MainActivity extends Activity {
 
@@ -27,15 +28,19 @@ public class MainActivity extends Activity {
         super.onCreate(icicle);
         mView = new DemoView(getApplication());
         setContentView(mView);
+
+//        setContentView(new ImageView(this));
+//
+//        DemoView.debug(this);
     }
 
     @Override protected void onPause() {
         super.onPause();
-        mView.onPause();
+//        mView.onPause();
     }
 
     @Override protected void onResume() {
         super.onResume();
-        mView.onResume();
+//        mView.onResume();
     }
 }

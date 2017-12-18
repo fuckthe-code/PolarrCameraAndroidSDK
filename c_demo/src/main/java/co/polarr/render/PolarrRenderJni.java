@@ -24,8 +24,9 @@ public class PolarrRenderJni {
           System.loadLibrary("PolarrRenderJNI");
      }
 
-     public static native void init(int texId, int width,
-                                    int height, int outTexId, byte[] yuvArr);
+     public static native void init(int texId, int width, int height,
+                                    int stride, int scanline,
+                                    int outTexId, byte[] yuvArr, boolean needEgl);
 
      public static native void resize(int width, int height);
 
@@ -35,6 +36,6 @@ public class PolarrRenderJni {
 
      public static native byte[] getYUVData();
 
-     public static native void setYUVData(int width,
-                                          int height, byte[] yuvArr);
+     public static native void setYUVData(int width, int height,
+                                          int stride, int scanline, byte[] yuvArr);
 }
