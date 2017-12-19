@@ -35,6 +35,7 @@ public class PolarrRenderJni {
      public static native void release();
 
      public static native byte[] getYUVData();
+     public static native byte[] getRgbData();
 
      public static native void setYUVData(int width, int height,
                                           int stride, int scanline, byte[] yuvArr);

@@ -31,6 +31,8 @@ enum POLARR_FILTER {
     DEFAULT
 };
 
+class RenderInternal;
+
 class PolarrRender {
 public:
     PolarrRender();
@@ -60,10 +62,10 @@ public:
 
     RenderState *getFilter(POLARR_FILTER filterType);
 
+    unsigned char *getOutputRgb(int *len);
+
 private:
-    unsigned int outputTex = 0;
-    bool isInited = false;
-    bool needEgl = false;
+    RenderInternal *params;
 };
 
 #endif // POLARR_RENDER_H

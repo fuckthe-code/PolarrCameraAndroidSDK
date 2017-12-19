@@ -63,7 +63,14 @@ Java_co_polarr_render_PolarrRenderJni_getYUVData(JNIEnv *env, jclass type) {
 
     return as_byte_array(env, yuvBytes, len);
 }
+extern "C"
+JNIEXPORT jbyteArray JNICALL
+Java_co_polarr_render_PolarrRenderJni_getRgbData(JNIEnv *env, jclass type) {
+    int len;
+    unsigned char *rgbBytes = polarrRender->getOutputRgb(&len);
 
+    return as_byte_array(env, rgbBytes, len);
+}
 extern "C"
 JNIEXPORT void JNICALL
 Java_co_polarr_render_PolarrRenderJni_renderTest(JNIEnv *env, jclass type) {

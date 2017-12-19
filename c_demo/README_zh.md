@@ -74,6 +74,12 @@ polarrRender->setInputYUV(INPUT_YUV_TYPE_NV21, width, height, stride, scanline, 
 int len;
 unsigned char *yuvBytes = polarrRender->getOutputYUV(INPUT_YUV_TYPE_NV21, &len);
 ```
+## 输出RGBA数据
+输出数据格式为RGBA_8888
+```objectivec
+int len;
+unsigned char *rgbaBytes = polarrRender->getOutputRgb(&len);
+```
 ## 释放资源
 ```objectivec
 delete polarrRender;
